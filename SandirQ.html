@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sandi Riki — Premium (Disempurnakan)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1:#0f172a; --bg-2:#1e293b; --card:#334155;
+      --accent-1:#0d9488; --accent-2:#14b8a6; --muted:#94a3b8;
+      --text:#f1f5f9; --success:#22c55e; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Poppins',sans-serif;
+      background: linear-gradient(135deg,var(--bg-1),var(--bg-2));
+      color:var(--text); padding:22px; display:flex; justify-content:center;
+    }
+    .wrap{width:100%;max-width:1100px;background:var(--card);border-radius:14px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    h1{margin:0;font-size:1.4rem;color:var(--accent-2)}
+    .subtitle{color:var(--muted);font-size:0.95rem;margin-top:4px}
+    .controls{display:flex;gap:8px;align-items:center}
+    .btn{cursor:pointer;border-radius:10px;padding:10px 14px;border:none;font-weight:700}
+    .btn-prim{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#03201e}
+    .btn-sec{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}
+    .main{display:grid;grid-template-columns:1.45fr .95fr;gap:16px;margin-top:14px}
+    .panel{background:var(--bg-2);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    label{display:block;color:var(--accent-2);font-weight:700;margin-bottom:8px}
+    textarea{width:100%;min-height:140px;padding:12px;border-radius:8px;border:2px solid rgba(255,255,255,0.04);background:var(--bg-1);color:var(--text);font-family: 'Courier New', monospace;resize:vertical}
+    textarea:focus{outline:none;box-shadow:0 8px 24px rgba(13,148,136,0.12);border-color:var(--accent-1)}
+    .io{display:flex;gap:12px}
+    .col{flex:1;display:flex;flex-direction:column;gap:8px}
+    .btn-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+    .status{margin-top:10px;padding:10px;border-left:4px solid var(--accent-1);background:var(--glass);color:var(--muted);border-radius:8px;font-size:0.95rem}
+    .stats{display:flex;gap:8px;margin-top:10px}
+    .stat{background:rgba(0,0,0,0.08);padding:8px;border-radius:8px;flex:1;text-align:center}
+    .stat .num{font-weight:800;color:var(--accent-2);font-size:1.1rem}
+    .right .section{margin-bottom:12px}
+    .cipher-table{width:100%;border-collapse:collapse;margin-top:8px;font-family: monospace}
+    .cipher-table th,.cipher-table td{padding:8px;border:1px solid rgba(255,255,255,0.03);text-align:center}
+    .cipher-table th{color:var(--accent-2);background:var(--bg-1)}
+    .history{display:flex;flex-direction:column;gap:8px}
+    .history-item{background:rgba(0,0,0,0.06);padding:8px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .small{font-size:0.85rem;color:var(--muted)}
+    .toast{position:fixed;right:20px;bottom:20px;background:var(--success);color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(34,197,94,0.16);display:none;z-index:999}
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:0.85rem}
+    .flexrow{display:flex;gap:8px;align-items:center}
+    input[type="text"]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--bg-1);color:var(--text)}
+    .kbd{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px;font-weight:700;font-size:0.85rem}
+    @media (max-width:980px){.main{grid-template-columns:1fr}.btn-row{grid-template-columns:repeat(1,1fr)}}
+  </style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <div class="top">
+      <div>
+        <h1>🔐 Sandi Riki — Premium</h1>
+        <div class="subtitle">Enkripsi & dekripsi substitusi — kunci custom, riwayat, dan share cepat</div>
+      </div>
+      <div class="controls" role="toolbar" aria-label="Kontrol">
+        <button class="btn btn-sec" id="btnSample" title="Isi contoh terenkripsi">Contoh Cepat</button>
+        <button class="btn btn-sec" id="btnToggleMap" title="Tampilkan/ sembunyikan peta cipher">Peta Cipher</button>
+        <button class="btn btn-sec" id="btnToggleHistory" title="Tampilkan/ sembunyikan riwayat">Riwayat</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <!-- LEFT -->
+      <section class="panel" aria-labelledby="ioTitle">
+        <div id="ioTitle" style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <label>📝 Input Teks</label>
+            <div class="small">Shortcut: <span class="kbd">Ctrl+E</span> Enkripsi • <span class="kbd">Ctrl+D</span> Dekripsi • <span class="kbd">Ctrl+K</span> Bersihkan</div>
+          </div>
+          <div class="small">Vokal A,E,I,O,U & Z tidak berubah</div>
+        </div>
+
+        <div class="io" style="margin-top:8px">
+          <div class="col">
+            <textarea id="inputText" aria-label="Input teks" placeholder="Ketik atau paste teks di sini..."></textarea>
+
+            <div class="btn-row" role="toolbar" aria-label="Aksi utama">
+              <button class="btn btn-prim" id="btnEncrypt">🔐 Enkripsi</button>
+              <button class="btn btn-prim" id="btnDecrypt">🔓 Dekripsi</button>
+              <button class="btn btn-sec" id="btnCopy">📋 Salin Hasil</button>
+              <button class="btn btn-sec" id="btnClear">🧹 Bersihkan</button>
+            </div>
+
+            <div class="status" id="status" aria-live="polite">Masukkan teks lalu pilih Enkripsi atau Dekripsi.</div>
+
+            <div class="stats" aria-hidden="false">
+              <div class="stat"><div class="num" id="charCount">0</div><div class="small">Karakter</div></div>
+              <div class="stat"><div class="num" id="encCount">0</div><div class="small">Total Enkripsi</div></div>
+              <div class="stat"><div class="num" id="decCount">0</div><div class="small">Total Dekripsi</div></div>
+            </div>
+          </div>
+
+          <div class="col">
+            <label>🔒 Output Hasil</label>
+            <textarea id="outputText" aria-label="Output hasil" readonly placeholder="Hasil enkripsi/dekripsi muncul di sini..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn btn-sec" id="btnSelect">Pilih Semua</button>
+              <button class="btn btn-sec" id="btnDownload">Unduh (.txt)</button>
+              <button class="btn btn-prim" id="btnShareWA">Share WA</button>
+              <button class="btn btn-sec" id="btnShareTG">Share TG</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="panel right" aria-labelledby="infoTitle">
+        <div class="section" id="mapPanel" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong style="color:var(--accent-2)">🗺️ Peta Cipher</strong><div class="small">Kunci default atau custom</div></div>
+            <div class="flexrow">
+              <input id="customKey" type="text" placeholder="Ketik 26 huruf mapping (optional)" aria-label="Kunci custom" style="min-width:180px">
+              <button class="btn btn-sec" id="applyKey">Terapkan</button>
+            </div>
+          </div>
+          <table class="cipher-table" aria-hidden="false" id="cipherTable">
+            <thead><tr><th>Huruf</th><th>Hasil</th><th>Huruf</th><th>Hasil</th></tr></thead>
+            <tbody id="cipherBody"></tbody>
+          </table>
+          <div class="small" style="margin-top:8px;color:var(--muted)">Contoh format kunci: N P Q R ... (26 huruf tanpa spasi akan diterima juga)</div>
+        </div>
+
+        <div class="section" id="historyPanel" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong style="color:var(--accent-2)">📜 Riwayat</strong><div class="small">Menyimpan hingga 20 terbaru</div></div>
+            <div class="flexrow">
+              <button class="btn btn-sec" id="exportHistory">Export</button>
+              <button class="btn btn-sec" id="importHistory">Import</button>
+            </div>
+          </div>
+          <div class="history" id="historyList" style="margin-top:8px"><div class="small">Belum ada riwayat.</div></div>
+        </div>
+
+        <div class="section" style="margin-top:10px">
+          <h3 style="margin:0;color:var(--accent-2)">ℹ️ Info & Tips</h3>
+          <p class="small" style="margin-top:8px">• Tombol shortcut: <span class="kbd">Ctrl+E</span> enkripsi, <span class="kbd">Ctrl+D</span> dekripsi, <span class="kbd">Ctrl+K</span> bersihkan, <span class="kbd">Ctrl+H</span> toggle riwayat.</p>
+          <p class="small">• Jika ingin kunci yang akurat gunakan 26 huruf A–Z untuk menentukan output pengganti A..Z. Sistem akan memvalidasi kunci.</p>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <div class="small">Versi: 2026.08 — Sempurna</div>
+      <div class="small">Hak cipta • Sandi Riki</div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Tersalin</div>
+
+  <script>
+    // Default mapping (A..Z => value)
+    const DEFAULT_KEY = "ANPQERSTIVWX YMC O C D F G H U J K L M Z".replace(/\s+/g,''); // placeholder replaced below
+    // Accurate default mapping from previous version:
+    const DEFAULT_MAP_STR = "ANPQERSTIVWX YMC D F G H U J K L M Z".replace(/\s+/g,''); // we will override with explicit mapping below
+
+    // Build default mappings explicit (based on prior ENCRYPTION_MAP)
+    const DEFAULT_ENC = {
+      'A':'A','B':'N','C':'P','D':'Q','E':'E','F':'R','G':'S','H':'T',
+      'I':'I','J':'V','K':'W','L':'X','M':'Y','N':'B','O':'O','P':'C',
+      'Q':'D','R':'F','S':'G','T':'H','U':'U','V':'J','W':'K','X':'L',
+      'Y':'M','Z':'Z'
+    };
+
+    // Utility
+    const id = (s)=>document.getElementById(s);
+    const upperOnly = (s)=>String(s||'').toUpperCase();
+
+    // State
+    let ENC_MAP = Object.assign({}, DEFAULT_ENC);
+    let DEC_MAP = Object.fromEntries(Object.entries(ENC_MAP).map(([k,v])=>[v,k]));
+    const HISTORY_KEY = 'sandi_riki_history_v2';
+    let history = [];
+    let encCount = 0, decCount = 0;
+
+    // Elements
+    const inputText = id('inputText'), outputText = id('outputText');
+    const charCount = id('charCount'), encCountEl = id('encCount'), decCountEl = id('decCount');
+    const status = id('status'), cipherBody = id('cipherBody'), toast = id('toast');
+    const mapPanel = id('mapPanel'), historyPanel = id('historyPanel'), cipherTable = id('cipherTable');
+
+    // Initialize
+    function init(){
+      applyMap(ENC_MAP); // populate table
+      bindEvents();
+      loadHistory();
+      updateCounts();
+    }
+
+    function bindEvents(){
+      id('btnEncrypt').addEventListener('click', ()=>process('encrypt'));
+      id('btnDecrypt').addEventListener('click', ()=>process('decrypt'));
+      id('btnCopy').addEventListener('click', copyOutput);
+      id('btnClear').addEventListener('click', clearAll);
+      id('btnSelect').addEventListener('click', ()=>{ outputText.select(); });
+      id('btnDownload').addEventListener('click', downloadOutput);
+      id('btnToggleMap').addEventListener('click', ()=>{ mapPanel.style.display = mapPanel.style.display === 'none' ? 'block' : 'none'; });
+      id('btnToggleHistory').addEventListener('click', ()=>{ historyPanel.style.display = historyPanel.style.display === 'none' ? 'block' : 'none'; renderHistory(); });
+      id('btnSample').addEventListener('click', fillSample);
+      id('applyKey').addEventListener('click', applyCustomKey);
+      id('btnShareWA').addEventListener('click', shareWhatsApp);
+      id('btnShareTG').addEventListener('click', shareTelegram);
+      id('exportHistory').addEventListener('click', exportHistory);
+      id('importHistory').addEventListener('click', importHistory);
+      id('customKey').addEventListener('keydown', (e)=>{ if (e.key==='Enter') applyCustomKey(); });
+      inputText.addEventListener('input', ()=>{ charCount.textContent = inputText.value.length; });
+      window.addEventListener('keydown', (e)=>{ if (e.ctrlKey && !e.shiftKey){ const k = e.key.toLowerCase(); if (k==='e'){ e.preventDefault(); process('encrypt'); } if (k==='d'){ e.preventDefault(); process('decrypt'); } if (k==='k'){ e.preventDefault(); clearAll(); } if (k==='h'){ e.preventDefault(); id('btnToggleHistory').click(); } } });
+      id('cipherBody').addEventListener('click', (ev)=>{ if (ev.target && ev.target.matches('td.copy')){ navigator.clipboard.writeText(ev.target.dataset.val || '').then(()=>showToast('Disalin')); }});
+      // share buttons for quick conversation
+      id('btnShareWA').addEventListener('touchstart', shareWhatsApp);
+      id('btnShareTG').addEventListener('touchstart', shareTelegram);
+    }
+
+    function process(mode){
+      const text = inputText.value;
+      if (!text || !text.trim()){ status.textContent = '⚠️ Masukkan teks terlebih dahulu.'; return; }
+      const out = cipher(text, mode);
+      outputText.value = out;
+      if (mode==='encrypt'){ encCount++; encCountEl.textContent = encCount; status.textContent = '🔐 Teks berhasil dienkripsi.'; }
+      else { decCount++; decCountEl.textContent = decCount; status.textContent = '🔓 Teks berhasil didekripsi.'; }
+      addHistory(text, out, mode);
+    }
+
+    function cipher(text, mode){
+      const map = (mode==='encrypt') ? ENC_MAP : DEC_MAP;
+      const up = upperOnly(text);
+      let out = '';
+      for (const ch of up){
+        out += map[ch] !== undefined ? map[ch] : ch;
+      }
+      return out;
+    }
+
+    function applyMap(map){
+      // populate table
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      let rows = '';
+      for (let i=0;i<letters.length;i+=2){
+        const a = letters[i], b = letters[i+1] || '';
+        rows += `<tr><td>${a}</td><td class="copy" data-val="${map[a]||''}">${map[a]||''}</td><td>${b}</td><td class="copy" data-val="${map[b]||''}">${map[b]||''}</td></tr>`;
+      }
+      cipherBody.innerHTML = rows;
+      // update map globals
+      ENC_MAP = Object.assign({}, map);
+      DEC_MAP = Object.fromEntries(Object.entries(ENC_MAP).map(([k,v])=>[v,k]));
+    }
+
+    function applyCustomKey(){
+      const raw = upperOnly(id('customKey').value).replace(/[^A-Z]/g,'');
+      if (!raw){ status.textContent = '⚠️ Kunci kosong — gunakan mapping default.'; return; }
+      if (raw.length !== 26){
+        status.textContent = '⚠️ Kunci harus 26 huruf A–Z (tanpa duplikasi).';
+        return;
+      }
+      // validate uniqueness
+      const set = new Set(raw.split(''));
+      if (set.size !== 26){ status.textContent = '⚠️ Kunci tidak valid — ditemukan duplikat.'; return; }
+      // build mapping A..Z -> raw chars
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const map = {};
+      for (let i=0;i<26;i++){ map[letters[i]] = raw[i]; }
+      applyMap(map);
+      status.textContent = '✅ Kunci custom diterapkan.';
+    }
+
+    function copyOutput(){
+      const txt = outputText.value;
+      if (!txt){ status.textContent = '⚠️ Tidak ada hasil untuk disalin.'; return; }
+      navigator.clipboard.writeText(txt).then(()=>{ showToast('Hasil disalin'); status.textContent = '✅ Hasil berhasil disalin.'; }).catch(()=>{ status.textContent = '⚠️ Gagal menyalin.'; });
+    }
+
+    function downloadOutput(){
+      const txt = outputText.value;
+      if (!txt){ status.textContent = '⚠️ Tidak ada hasil untuk diunduh.'; return; }
+      const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sandi_riki_result.txt';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+      status.textContent = '⬇️ File diunduh.';
+    }
+
+    function showToast(msg){
+      toast.textContent = msg; toast.style.display = 'block';
+      setTimeout(()=> toast.style.display = 'none', 2000);
+    }
+
+    // History: persist up to 20 items
+    function loadHistory(){
+      try{ const raw = localStorage.getItem(HISTORY_KEY); if (raw) history = JSON.parse(raw) || []; }catch(e){ history = []; }
+      renderHistory();
+    }
+    function saveHistory(){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }catch(e){} }
+    function addHistory(inp,out,mode){
+      const item = { input: inp, output: out, mode: mode, time: new Date().toLocaleString('id-ID') };
+      history.unshift(item);
+      if (history.length>20) history.pop();
+      saveHistory(); renderHistory();
+    }
+    function renderHistory(){
+      const el = id('historyList');
+      if (!history || history.length===0){ el.innerHTML = '<div class="small">Belum ada riwayat.</div>'; return; }
+      el.innerHTML = history.map((h,idx)=>`
+        <div class="history-item" data-idx="${idx}">
+          <div style="max-width:70%"><div style="font-family:monospace">${escapeHtml(short(h.input,60))} → ${escapeHtml(short(h.output,60))}</div><div class="small">${h.time} • ${h.mode}</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sec" data-act="load" data-idx="${idx}">▶</button>
+            <button class="btn btn-sec" data-act="copy" data-idx="${idx}">📋</button>
+            <button class="btn btn-sec" data-act="del" data-idx="${idx}">🗑</button>
+          </div>
+        </div>`).join('');
+      // attach listeners
+      el.querySelectorAll('button').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const act = btn.dataset.act, idx = Number(btn.dataset.idx), item = history[idx];
+          if (!item) return;
+          if (act==='load'){ inputText.value = item.input; outputText.value = item.output; charCount.textContent = inputText.value.length; status.textContent = 'Riwayat dimuat.'; }
+          if (act==='copy'){ navigator.clipboard.writeText(item.output).then(()=> showToast('Hasil riwayat disalin')); }
+          if (act==='del'){ if (confirm('Hapus item riwayat ini?')){ history.splice(idx,1); saveHistory(); renderHistory(); status.textContent='Item riwayat dihapus.'; } }
+        });
+      });
+    }
+
+    // Export / Import history
+    function exportHistory(){
+      const txt = JSON.stringify(history, null, 2);
+      const blob = new Blob([txt], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sandi_riki_history.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+      status.textContent = 'Riwayat diekspor.';
+    }
+    function importHistory(){
+      const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+      inp.onchange = ()=> {
+        if (!inp.files || !inp.files[0]) return;
+        const fr = new FileReader();
+        fr.onload = ()=> {
+          try{ const data = JSON.parse(fr.result); if (!Array.isArray(data)){ status.textContent='File tidak valid.'; return; }
+            history = data.slice(0,20); saveHistory(); renderHistory(); status.textContent='Riwayat berhasil diimpor.'; }catch(e){ status.textContent='Gagal membaca file.'; }
+        };
+        fr.readAsText(inp.files[0]);
+      };
+      inp.click();
+    }
+
+    // Helpers
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function short(s,n){ return s.length>n? s.slice(0,n)+'...': s; }
+
+    // Custom key handling: accept 26 chars or spaced tokens
+    function parseKeyString(raw){
+      const toks = raw.replace(/[^A-Za-z]/g,'').toUpperCase();
+      if (toks.length !== 26) return null;
+      // check uniqueness
+      const set = new Set(toks.split(''));
+      if (set.size !== 26) return null;
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const map = {};
+      for (let i=0;i<26;i++) map[letters[i]] = toks[i];
+      return map;
+    }
+
+    function applyCustomFromField(){
+      const raw = id('customKey').value;
+      const map = parseKeyString(raw);
+      if (!map){ status.textContent = '⚠️ Kunci tidak valid. Pastikan 26 karakter unik A–Z.'; return; }
+      applyMap(map);
+      status.textContent = '✅ Kunci custom diterapkan.';
+    }
+
+    // UI helpers continued
+    id('applyKey')?.addEventListener('click', applyCustomFromField);
+
+    // share
+    function getResultText(){
+      const inp = inputText.value || '';
+      const out = outputText.value || '';
+      return `Sandi Riki • Hasil\n\nInput:\n${inp}\n\nOutput:\n${out}\n\n— Sandi Riki`;
+    }
+    function shareWhatsApp(){ const t = encodeURIComponent(getResultText()); window.open(`https://wa.me/?text=${t}`, '_blank'); }
+    function shareTelegram(){ const t = encodeURIComponent(getResultText()); window.open(`https://t.me/share/url?url=&text=${t}`, '_blank'); }
+
+    // sample fill
+    function fillSample(){
+      inputText.value = 'AWU IYAY YATQI';
+      charCount.textContent = inputText.value.length;
+      // decrypt to show result quickly
+      process('decrypt');
+    }
+
+    function clearAll(){ inputText.value=''; outputText.value=''; charCount.textContent='0'; status.textContent='Teks dibersihkan.'; }
+
+    function updateCounts(){ encCountEl.textContent = encCount; decCountEl.textContent = decCount; }
+
+    // default apply mapping
+    function applyMap(map){
+      // set global ENC_MAP and DEC_MAP and refresh UI
+      ENC_MAP = Object.assign({}, map);
+      DEC_MAP = Object.fromEntries(Object.entries(ENC_MAP).map(([k,v])=>[v,k]));
+      // populate table
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      let html = '';
+      for (let i=0;i<letters.length;i+=2){
+        const a = letters[i], b = letters[i+1]||'';
+        html += `<tr><td>${a}</td><td class="val" data-val="${ENC_MAP[a]||''}">${ENC_MAP[a]||''}</td><td>${b}</td><td class="val" data-val="${ENC_MAP[b]||''}">${ENC_MAP[b]||''}</td></tr>`;
+      }
+      cipherBody.innerHTML = html;
+    }
+
+    // on load: set default map
+    (function(){
+      applyMap(DEFAULT_ENC);
+      init();
+    })();
+
+    // Expose small functions for debug
+    window._sandi = { applyMap, parseKeyString, DEFAULT_ENC };
+
+  </script>
+</body>
+</html>
